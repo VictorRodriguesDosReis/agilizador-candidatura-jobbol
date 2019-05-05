@@ -6,13 +6,13 @@ from email.mime.text import MIMEText
 
 class Email:
 
-    def __init__(self, fileAttachment=None, subject=None, bodyText=None, senderEmail=None, receiverEmail=None, emailPassword=None):
+    def __init__(self, attachmentFile=None, subject=None, bodyText=None, senderEmail=None, receiverEmail=None, emailPassword=None):
         self.subject = subject
         self.bodyText = bodyText
         self.senderEmail = senderEmail
         self.receiverEmail = receiverEmail
         self.emailPassword = emailPassword
-        self.fileAttachment = fileAttachment
+        self.attachmentFile = attachmentFile
         self.message = MIMEMultipart()
 
     # Estabelece o assunto do email
@@ -42,9 +42,11 @@ class Email:
         self.message.attach(MIMEText(self.bodyText, "plain"))
 
     # Anexa o arquivo PDF à mensagem do email
-    def addFileAttachment(self):
+    def addAttachmentFile(self):
+        fileName = self.attachmentFile.split('/')[-1]
+
         # Abre o arquivo PDF no modo binário
-        with open(self.fileAttachment, "rb") as attachment:
+        with open(self.attachmentFile, "rb") as attachment:
             part = MIMEBase("application", "pdf")
             part.set_payload(attachment.read())
 
@@ -54,7 +56,7 @@ class Email:
         # Adiciona o cabeçalho para o anexo
         part.add_header(
             "Content-Disposition",
-            "attachment", filename=self.fileAttachment,
+            "attachment", filename=fileName,
         )
 
         self.message.attach(part)
@@ -63,7 +65,7 @@ class Email:
     def mountsEmailStructure(self):
         self.createEmailHeader()
         self.addEmailBody()
-        self.addFileAttachment()
+        self.addAttachmentFile()
         self.setMessage(self.message.as_string())
 
 
